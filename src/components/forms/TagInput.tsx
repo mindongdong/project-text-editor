@@ -12,6 +12,7 @@ import { FieldError } from 'react-hook-form';
  * - Click X button to delete specific tag
  * - Duplicate tag prevention
  * - Maximum tag limit (default: 10)
+ * - Korean IME (Input Method Editor) composition event handling
  * - React Hook Form integration
  * - Accessibility compliant (ARIA labels, keyboard navigation)
  * - No external dependencies (pure React implementation)
@@ -47,6 +48,9 @@ export default function TagInput({
 
   // State for validation error
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  // State for Korean IME composition tracking
+  const [isComposing, setIsComposing] = useState(false);
 
   // Input ref for focus management
   const inputRef = useRef<HTMLInputElement>(null);
@@ -125,9 +129,15 @@ export default function TagInput({
    * Handle key down events
    */
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    // Enter: Add tag
+    // Enter: Add tag (but not during Korean IME composition)
     if (e.key === 'Enter') {
       e.preventDefault();
+
+      // Skip tag addition if IME is still composing (Korean input)
+      if (isComposing) {
+        return;
+      }
+
       if (inputValue) {
         addTag(inputValue);
       }
@@ -156,6 +166,20 @@ export default function TagInput({
     if (validationError) {
       setValidationError(null);
     }
+  };
+
+  /**
+   * Handle composition start (Korean IME starts)
+   */
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  /**
+   * Handle composition end (Korean IME completes)
+   */
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
   };
 
   /**
@@ -240,6 +264,8 @@ export default function TagInput({
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
           disabled={disabled || value.length >= maxTags}
           placeholder={value.length === 0 ? placeholder : ''}
           aria-label="새 태그 입력"

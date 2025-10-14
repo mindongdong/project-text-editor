@@ -2,6 +2,7 @@
 
 import { OutputData } from '@editorjs/editorjs';
 import { EditorBlock } from '@/types/editor';
+import { sanitizeBasic } from '@/utils/sanitize';
 
 interface ProjectViewerProps {
   title: string;
@@ -179,20 +180,29 @@ export default function ProjectViewer({ title, contentJson }: ProjectViewerProps
     }
   };
 
+  // Format timestamp from contentJson (to avoid hydration mismatch)
+  const formattedDate = contentJson.time
+    ? new Date(contentJson.time).toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : null;
+
+  const isoDate = contentJson.time ? new Date(contentJson.time).toISOString() : '';
+
   return (
     <article className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <header className="mb-8 pb-6 border-b border-gray-200">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">{title}</h1>
         <div className="flex items-center gap-4 text-sm text-gray-500">
-          <time dateTime={new Date().toISOString()}>
-            {new Date().toLocaleDateString('ko-KR', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </time>
-          <span>•</span>
+          {formattedDate && (
+            <>
+              <time dateTime={isoDate}>{formattedDate}</time>
+              <span>•</span>
+            </>
+          )}
           <span>Editor.js v{contentJson.version}</span>
         </div>
       </header>
@@ -222,25 +232,4 @@ export default function ProjectViewer({ title, contentJson }: ProjectViewerProps
       </footer>
     </article>
   );
-}
-
-/**
- * Basic HTML sanitization
- * Phase 1: Simple escaping of dangerous tags
- * Phase 4: Will be replaced with DOMPurify
- */
-function sanitizeBasic(html: string): string {
-  if (!html) return '';
-
-  // Allow basic formatting tags only
-  const allowedTags = ['b', 'i', 'u', 'strong', 'em', 'br', 'span'];
-
-  // Remove script tags and their content
-  html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-
-  // Remove event handlers
-  html = html.replace(/on\w+\s*=\s*["'][^"']*["']/gi, '');
-  html = html.replace(/on\w+\s*=\s*[^\s>]*/gi, '');
-
-  return html;
 }

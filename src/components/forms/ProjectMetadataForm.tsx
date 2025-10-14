@@ -2,19 +2,23 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { ProjectFormData, projectFormSchema } from '@/schemas/project.schema';
 import ImageUploadField from '@/components/forms/ImageUploadField';
 import TagInput from '@/components/forms/TagInput';
+import SummaryFieldGroup from '@/components/forms/SummaryFieldGroup';
+import { formatSummary } from '@/utils/formatSummary';
 
 /**
  * Phase 2 Day 8-10: ProjectMetadataForm Component
  *
  * Complete metadata form integrating all Phase 2 components:
- * - ImageUploadField (Day 4-5): thumbnail uploads with drag & drop
+ * - ImageUploadField (Day 4-5): thumbnail upload with drag & drop
  * - TagInput (Day 6-7): hashtag management with keyboard shortcuts
+ * - SummaryFieldGroup: structured summary inputs (period, advisor, participants)
  *
  * Features:
- * - 8 form fields: title, subTitle, thumbnail1, thumbnail2, hashTag, summary, isOnMain, isGroup
+ * - 6 form fields: title, subTitle, thumbnail1, hashTag, summary (auto-generated), structured fields
  * - React Hook Form integration with Zod validation
  * - Full accessibility compliance (WCAG 2.1 AA)
  * - Responsive design with Tailwind CSS
@@ -45,13 +49,33 @@ export default function ProjectMetadataForm({
       title: defaultValues?.title || '',
       subTitle: defaultValues?.subTitle || '',
       thumbnail1: defaultValues?.thumbnail1 || '',
-      thumbnail2: defaultValues?.thumbnail2 || '',
       hashTag: defaultValues?.hashTag || [],
+      startDate: defaultValues?.startDate || '',
+      endDate: defaultValues?.endDate || '',
+      advisor: defaultValues?.advisor || '',
+      participants: defaultValues?.participants || [],
       summary: defaultValues?.summary || '',
-      isOnMain: defaultValues?.isOnMain || false,
-      isGroup: defaultValues?.isGroup || false,
     },
   });
+
+  // Auto-generate summary when structured fields change
+  useEffect(() => {
+    const startDate = watch('startDate');
+    const endDate = watch('endDate');
+    const advisor = watch('advisor');
+    const participants = watch('participants');
+
+    // Only generate if required fields are present
+    if (startDate && endDate) {
+      const formattedSummary = formatSummary({
+        startDate,
+        endDate,
+        advisor: advisor || '',
+        participants: participants || [],
+      });
+      setValue('summary', formattedSummary, { shouldValidate: true });
+    }
+  }, [watch('startDate'), watch('endDate'), watch('advisor'), watch('participants'), setValue, watch]);
 
   return (
     <form
@@ -125,23 +149,15 @@ export default function ProjectMetadataForm({
         )}
       </div>
 
-      {/* Thumbnail Fields (Day 4-5 Integration) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Thumbnail Field (Day 4-5 Integration) */}
+      <div>
         <ImageUploadField
-          label="썸네일 1"
+          label="썸네일"
           name="thumbnail1"
           register={register}
           setValue={setValue}
           currentValue={watch('thumbnail1')}
           error={errors.thumbnail1}
-        />
-        <ImageUploadField
-          label="썸네일 2"
-          name="thumbnail2"
-          register={register}
-          setValue={setValue}
-          currentValue={watch('thumbnail2')}
-          error={errors.thumbnail2}
         />
       </div>
 
@@ -160,102 +176,17 @@ export default function ProjectMetadataForm({
         />
       </div>
 
-      {/* Summary Field (Required) */}
-      <div>
-        <label htmlFor="summary" className="block text-sm font-medium text-gray-700 mb-2">
-          요약 정보 <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          id="summary"
-          {...register('summary')}
-          disabled={isSubmitting}
-          placeholder="프로젝트 요약 정보를 입력하세요"
-          rows={4}
-          aria-required="true"
-          aria-invalid={!!errors.summary}
-          aria-describedby={errors.summary ? 'summary-error' : undefined}
-          className={`
-            w-full px-4 py-2
-            border rounded-lg
-            transition-colors resize-vertical
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-            disabled:bg-gray-100 disabled:cursor-not-allowed
-            ${errors.summary
-              ? 'border-red-300 bg-red-50'
-              : 'border-gray-300 hover:border-gray-400'
-            }
-          `}
-        />
-        {errors.summary && (
-          <p id="summary-error" className="mt-1 text-sm text-red-600" role="alert">
-            {errors.summary.message}
-          </p>
-        )}
-        <p className="mt-1 text-xs text-gray-500">
-          프로젝트의 핵심 내용을 간단히 설명해주세요
-        </p>
-      </div>
+      {/* Summary Field Group (Structured Inputs) */}
+      <SummaryFieldGroup
+        register={register}
+        errors={errors}
+        disabled={isSubmitting}
+        setValue={setValue}
+        watch={watch}
+      />
 
-      {/* Checkbox Fields */}
-      <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-        <p className="text-sm font-medium text-gray-700 mb-3">표시 설정</p>
-
-        {/* isOnMain Checkbox */}
-        <div className="flex items-start">
-          <div className="flex items-center h-5">
-            <input
-              id="isOnMain"
-              type="checkbox"
-              {...register('isOnMain')}
-              disabled={isSubmitting}
-              aria-describedby="isOnMain-description"
-              className="
-                w-4 h-4
-                text-blue-600
-                border-gray-300 rounded
-                focus:ring-2 focus:ring-blue-500
-                disabled:opacity-50 disabled:cursor-not-allowed
-              "
-            />
-          </div>
-          <div className="ml-3">
-            <label htmlFor="isOnMain" className="text-sm font-medium text-gray-700 cursor-pointer">
-              메인 페이지에 표시
-            </label>
-            <p id="isOnMain-description" className="text-xs text-gray-500 mt-1">
-              이 프로젝트를 메인 페이지에서 강조 표시합니다
-            </p>
-          </div>
-        </div>
-
-        {/* isGroup Checkbox */}
-        <div className="flex items-start">
-          <div className="flex items-center h-5">
-            <input
-              id="isGroup"
-              type="checkbox"
-              {...register('isGroup')}
-              disabled={isSubmitting}
-              aria-describedby="isGroup-description"
-              className="
-                w-4 h-4
-                text-blue-600
-                border-gray-300 rounded
-                focus:ring-2 focus:ring-blue-500
-                disabled:opacity-50 disabled:cursor-not-allowed
-              "
-            />
-          </div>
-          <div className="ml-3">
-            <label htmlFor="isGroup" className="text-sm font-medium text-gray-700 cursor-pointer">
-              그룹 프로젝트
-            </label>
-            <p id="isGroup-description" className="text-xs text-gray-500 mt-1">
-              이 프로젝트가 팀 또는 그룹으로 진행된 경우 체크하세요
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Hidden summary field for form submission */}
+      <input type="hidden" {...register('summary')} />
 
       {/* Form Actions */}
       <div className="flex justify-end gap-3 pt-4 border-t">
@@ -325,10 +256,11 @@ export default function ProjectMetadataForm({
           <span className="font-semibold">💡 작성 가이드:</span>
         </p>
         <ul className="mt-2 text-sm text-blue-700 list-disc list-inside space-y-1">
-          <li>제목, 해시태그, 요약 정보는 필수 입력 항목입니다</li>
+          <li>제목, 해시태그, 프로젝트 기간(시작일/종료일)은 필수 입력 항목입니다</li>
           <li>썸네일은 JPG, PNG, WebP, GIF 형식을 지원하며 최대 5MB까지 업로드 가능합니다</li>
           <li>해시태그는 Enter 키로 추가하고 Backspace로 삭제할 수 있습니다</li>
-          <li>요약 정보는 프로젝트 목록에서 표시됩니다</li>
+          <li>프로젝트 요약 정보는 기간, 지도교수, 참여학생 정보로부터 자동 생성됩니다</li>
+          <li>참여학생은 최대 20명까지 입력할 수 있으며, Enter 키로 추가하고 X 버튼으로 삭제할 수 있습니다</li>
         </ul>
       </div>
     </form>

@@ -1,16 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
-import EditorJS, { OutputData } from '@editorjs/editorjs';
+import EditorJS, { OutputData, API } from '@editorjs/editorjs';
 import Header from '@editorjs/header';
-// @ts-ignore - Paragraph doesn't have proper types
 import Paragraph from '@editorjs/paragraph';
-// @ts-ignore - Image doesn't have proper types
-import ImageTool from '@editorjs/image';
-// @ts-ignore - List doesn't have proper types
 import List from '@editorjs/list';
-// @ts-ignore - Embed doesn't have proper types
+// @ts-expect-error - Embed doesn't have proper types
 import Embed from '@editorjs/embed';
+import AdvancedImageTool from './tools/AdvancedImageTool';
 import { EditorComponentProps } from '@/types/editor';
 
 /**
@@ -80,7 +77,7 @@ const EditorComponent = forwardRef<EditorRef, EditorComponentProps>(
                * Supports h1-h4 levels for Phase 1
                */
               header: {
-                // @ts-ignore
+                // @ts-expect-error - Header type mismatch
                 class: Header,
                 config: {
                   placeholder: '제목을 입력하세요',
@@ -95,7 +92,7 @@ const EditorComponent = forwardRef<EditorRef, EditorComponentProps>(
                * Basic text editing
                */
               paragraph: {
-                // @ts-ignore - Paragraph type issues with Editor.js
+                // @ts-expect-error - Paragraph type mismatch
                 class: Paragraph,
                 inlineToolbar: true,
               },
@@ -105,87 +102,9 @@ const EditorComponent = forwardRef<EditorRef, EditorComponentProps>(
                * File upload and URL support
                */
               image: {
-                // @ts-ignore
-                class: ImageTool,
+                class: AdvancedImageTool,
                 config: {
-                  endpoints: {
-                    byFile: '/api/upload-image', // API endpoint from Day 1-2
-                  },
-                  captionPlaceholder: '이미지 캡션을 입력하세요 (선택사항)',
-                  buttonContent: '이미지 선택',
-                  uploader: {
-                    /**
-                     * Upload image by file
-                     */
-                    async uploadByFile(file: File) {
-                      try {
-                        // Client-side validation
-                        const maxSize = 5 * 1024 * 1024; // 5MB
-                        if (file.size > maxSize) {
-                          throw new Error('파일 크기는 5MB를 초과할 수 없습니다');
-                        }
-
-                        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-                        if (!allowedTypes.includes(file.type)) {
-                          throw new Error('지원되지 않는 파일 형식입니다 (JPG, PNG, WebP, GIF만 가능)');
-                        }
-
-                        // Create FormData and upload
-                        const formData = new FormData();
-                        formData.append('image', file);
-
-                        const response = await fetch('/api/upload-image', {
-                          method: 'POST',
-                          body: formData,
-                        });
-
-                        if (!response.ok) {
-                          const errorData = await response.json();
-                          throw new Error(errorData.error || '이미지 업로드에 실패했습니다');
-                        }
-
-                        const result = await response.json();
-
-                        // Return Editor.js compatible format
-                        return {
-                          success: 1,
-                          file: {
-                            url: result.file.url,
-                            width: result.file.width,
-                            height: result.file.height,
-                          },
-                        };
-                      } catch (error) {
-                        console.error('Image upload error:', error);
-                        alert(error instanceof Error ? error.message : '이미지 업로드 중 오류가 발생했습니다');
-
-                        return {
-                          success: 0,
-                        };
-                      }
-                    },
-
-                    /**
-                     * Upload image by URL
-                     */
-                    async uploadByUrl(url: string) {
-                      try {
-                        // Validate URL format
-                        new URL(url);
-
-                        return {
-                          success: 1,
-                          file: {
-                            url,
-                          },
-                        };
-                      } catch (error) {
-                        return {
-                          success: 0,
-                        };
-                      }
-                    },
-                  },
+                  // Pass any necessary config here
                 },
               },
 
@@ -194,7 +113,6 @@ const EditorComponent = forwardRef<EditorRef, EditorComponentProps>(
                * Ordered and unordered lists
                */
               list: {
-                // @ts-ignore
                 class: List,
                 inlineToolbar: true,
                 config: {
@@ -207,7 +125,6 @@ const EditorComponent = forwardRef<EditorRef, EditorComponentProps>(
                * YouTube and Vimeo support
                */
               embed: {
-                // @ts-ignore
                 class: Embed,
                 config: {
                   services: {
@@ -231,7 +148,7 @@ const EditorComponent = forwardRef<EditorRef, EditorComponentProps>(
              * Called when content changes
              * Triggers onChange callback with debounce in parent
              */
-            onChange: async (api) => {
+            onChange: async (api: API) => {
               if (onChange && !readOnly) {
                 try {
                   const data = await api.saver.save();

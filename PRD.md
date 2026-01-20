@@ -175,9 +175,7 @@ const ProjectMetadataForm = ({ defaultValues, onSubmit }: ProjectMetadataFormPro
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           placeholder="프로젝트 제목을 입력하세요"
         />
-        {errors.title && (
-          <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
-        )}
+        {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>}
       </div>
 
       {/* 부제목 */}
@@ -192,9 +190,7 @@ const ProjectMetadataForm = ({ defaultValues, onSubmit }: ProjectMetadataFormPro
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           placeholder="부제목을 입력하세요 (선택사항)"
         />
-        {errors.subTitle && (
-          <p className="mt-1 text-sm text-red-600">{errors.subTitle.message}</p>
-        )}
+        {errors.subTitle && <p className="mt-1 text-sm text-red-600">{errors.subTitle.message}</p>}
       </div>
 
       {/* 썸네일 이미지 업로드 */}
@@ -227,9 +223,7 @@ const ProjectMetadataForm = ({ defaultValues, onSubmit }: ProjectMetadataFormPro
           onChange={(tags) => setValue('hashTag', tags)}
           placeholder="Enter를 눌러 태그 추가"
         />
-        {errors.hashTag && (
-          <p className="mt-1 text-sm text-red-600">{errors.hashTag.message}</p>
-        )}
+        {errors.hashTag && <p className="mt-1 text-sm text-red-600">{errors.hashTag.message}</p>}
       </div>
 
       {/* 요약 정보 */}
@@ -244,27 +238,17 @@ const ProjectMetadataForm = ({ defaultValues, onSubmit }: ProjectMetadataFormPro
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           placeholder="지도교수, 참여학생, 진행 날짜 등을 입력하세요"
         />
-        {errors.summary && (
-          <p className="mt-1 text-sm text-red-600">{errors.summary.message}</p>
-        )}
+        {errors.summary && <p className="mt-1 text-sm text-red-600">{errors.summary.message}</p>}
       </div>
 
       {/* 체크박스 */}
       <div className="flex gap-6">
         <label className="flex items-center">
-          <input
-            type="checkbox"
-            {...register('isOnMain')}
-            className="rounded border-gray-300"
-          />
+          <input type="checkbox" {...register('isOnMain')} className="rounded border-gray-300" />
           <span className="ml-2 text-sm">메인 페이지 노출</span>
         </label>
         <label className="flex items-center">
-          <input
-            type="checkbox"
-            {...register('isGroup')}
-            className="rounded border-gray-300"
-          />
+          <input type="checkbox" {...register('isGroup')} className="rounded border-gray-300" />
           <span className="ml-2 text-sm">그룹 프로젝트</span>
         </label>
       </div>
@@ -293,11 +277,7 @@ interface EditorComponentProps {
   readOnly?: boolean;
 }
 
-const EditorComponent = ({ 
-  initialData, 
-  onChange, 
-  readOnly = false 
-}: EditorComponentProps) => {
+const EditorComponent = ({ initialData, onChange, readOnly = false }: EditorComponentProps) => {
   const editorRef = useRef<EditorJS | null>(null);
   const [isReady, setIsReady] = useState(false);
 
@@ -311,7 +291,7 @@ const EditorComponent = ({
         readOnly,
         placeholder: '내용을 입력하세요. Tab 또는 /를 눌러 블록을 추가할 수 있습니다.',
         data: initialData,
-        
+
         tools: {
           header: {
             class: Header,
@@ -321,7 +301,7 @@ const EditorComponent = ({
               defaultLevel: 2,
             },
           },
-          
+
           list: {
             class: List,
             inlineToolbar: true,
@@ -329,7 +309,7 @@ const EditorComponent = ({
               defaultStyle: 'unordered',
             },
           },
-          
+
           image: {
             class: ImageTool,
             config: {
@@ -348,7 +328,9 @@ const EditorComponent = ({
                     // 2. 파일 형식 검증
                     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
                     if (!allowedTypes.includes(file.type)) {
-                      throw new Error('지원되지 않는 파일 형식입니다. (JPG, PNG, WebP, GIF만 가능)');
+                      throw new Error(
+                        '지원되지 않는 파일 형식입니다. (JPG, PNG, WebP, GIF만 가능)'
+                      );
                     }
 
                     // 3. FormData 생성 및 파일 추가
@@ -379,10 +361,14 @@ const EditorComponent = ({
                     };
                   } catch (error) {
                     console.error('Image upload error:', error);
-                    
+
                     // 사용자에게 에러 알림
-                    alert(error instanceof Error ? error.message : '이미지 업로드 중 오류가 발생했습니다');
-                    
+                    alert(
+                      error instanceof Error
+                        ? error.message
+                        : '이미지 업로드 중 오류가 발생했습니다'
+                    );
+
                     return {
                       success: 0,
                       message: error instanceof Error ? error.message : 'Upload failed',
@@ -397,7 +383,7 @@ const EditorComponent = ({
                   try {
                     // URL 유효성 검증
                     new URL(url);
-                    
+
                     return {
                       success: 1,
                       file: {
@@ -414,7 +400,7 @@ const EditorComponent = ({
               },
             },
           },
-          
+
           embed: {
             class: Embed,
             config: {
@@ -433,7 +419,7 @@ const EditorComponent = ({
         onReady: () => {
           console.log('Editor.js is ready to work!');
           setIsReady(true);
-          
+
           // Undo 플러그인 초기화
           if (editorRef.current) {
             new Undo({ editor: editorRef.current });
@@ -448,7 +434,7 @@ const EditorComponent = ({
             try {
               const data = await api.saver.save();
               onChange(data);
-              
+
               // 로컬 스토리지에 임시 저장 (3초 디바운스)
               saveToLocalStorage(data);
             } catch (error) {
@@ -477,10 +463,13 @@ const EditorComponent = ({
    */
   const saveToLocalStorage = useDebounce((data: OutputData) => {
     try {
-      localStorage.setItem('editor-draft', JSON.stringify({
-        data,
-        savedAt: new Date().toISOString(),
-      }));
+      localStorage.setItem(
+        'editor-draft',
+        JSON.stringify({
+          data,
+          savedAt: new Date().toISOString(),
+        })
+      );
     } catch (error) {
       console.error('Failed to save to localStorage:', error);
     }
@@ -510,8 +499,8 @@ const EditorComponent = ({
 
   return (
     <div className="editor-wrapper">
-      <div 
-        id="editorjs-container" 
+      <div
+        id="editorjs-container"
         className="prose max-w-none min-h-[400px] p-4 border rounded-lg"
       />
       {isReady && (
@@ -554,7 +543,7 @@ export const useAutoSave = () => {
     try {
       const draft = localStorage.getItem('editor-draft');
       if (!draft) return null;
-      
+
       return JSON.parse(draft);
     } catch (error) {
       console.error('Failed to load draft:', error);
@@ -600,10 +589,8 @@ const ProjectEditor = ({ mode, initialData, projectId }: ProjectEditorProps) => 
   // 임시 저장된 데이터 복구 확인
   useEffect(() => {
     if (hasDraft && mode === 'create') {
-      const shouldRestore = confirm(
-        '저장되지 않은 작업 내용이 있습니다. 복구하시겠습니까?'
-      );
-      
+      const shouldRestore = confirm('저장되지 않은 작업 내용이 있습니다. 복구하시겠습니까?');
+
       if (shouldRestore) {
         const draft = loadDraft();
         if (draft) {
@@ -642,10 +629,8 @@ const ProjectEditor = ({ mode, initialData, projectId }: ProjectEditorProps) => 
       const validatedData = projectFormSchema.parse(finalPostData);
 
       // 3. API 호출
-      const endpoint = mode === 'edit' 
-        ? `/api/projects/${projectId}` 
-        : '/api/projects';
-      
+      const endpoint = mode === 'edit' ? `/api/projects/${projectId}` : '/api/projects';
+
       const method = mode === 'edit' ? 'PUT' : 'POST';
 
       const response = await fetch(endpoint, {
@@ -667,29 +652,31 @@ const ProjectEditor = ({ mode, initialData, projectId }: ProjectEditorProps) => 
       alert('저장되었습니다!');
       clearDraft(); // 임시 저장 데이터 삭제
       setHasUnsavedChanges(false);
-      
+
       // 목록 페이지로 이동
       window.location.href = '/projects';
-
     } catch (error) {
       console.error('Save error:', error);
-      
+
       if (error instanceof z.ZodError) {
         // 유효성 검증 오류
-        const errorMessages = error.errors.map(err => err.message).join('\n');
+        const errorMessages = error.errors.map((err) => err.message).join('\n');
         alert(`입력 내용을 확인해주세요:\n${errorMessages}`);
       } else {
         // 기타 오류
         alert(error instanceof Error ? error.message : '저장 중 오류가 발생했습니다');
-        
+
         // 로컬 스토리지에 백업
         try {
           const backupData = await editorRef.current.save();
-          localStorage.setItem('editor-backup', JSON.stringify({
-            ...metaData,
-            contentJson: backupData,
-            backedUpAt: new Date().toISOString(),
-          }));
+          localStorage.setItem(
+            'editor-backup',
+            JSON.stringify({
+              ...metaData,
+              contentJson: backupData,
+              backedUpAt: new Date().toISOString(),
+            })
+          );
           alert('작업 내용이 로컬에 백업되었습니다');
         } catch (backupError) {
           console.error('Backup failed:', backupError);
@@ -707,10 +694,7 @@ const ProjectEditor = ({ mode, initialData, projectId }: ProjectEditorProps) => 
       </h1>
 
       {/* 메타데이터 폼 */}
-      <ProjectMetadataForm
-        defaultValues={initialData}
-        onSubmit={handleSave}
-      />
+      <ProjectMetadataForm defaultValues={initialData} onSubmit={handleSave} />
 
       {/* 에디터 */}
       <div className="mt-8">
@@ -735,7 +719,7 @@ const ProjectEditor = ({ mode, initialData, projectId }: ProjectEditorProps) => 
         >
           {isSaving ? '저장 중...' : '저장'}
         </button>
-        
+
         <button
           type="button"
           onClick={() => window.history.back()}
@@ -790,7 +774,7 @@ const ProjectViewer = ({ project }: ProjectViewerProps) => {
         dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.text) }}
       />
     ),
-    
+
     header: ({ data }: any) => {
       const level = Math.min(Math.max(data.level || 1, 1), 6);
       const Tag = `h${level}` as keyof JSX.IntrinsicElements;
@@ -802,7 +786,7 @@ const ProjectViewer = ({ project }: ProjectViewerProps) => {
         5: 'text-lg font-semibold mb-2',
         6: 'text-base font-semibold mb-2',
       };
-      
+
       return (
         <Tag
           className={classes[level as keyof typeof classes]}
@@ -810,10 +794,10 @@ const ProjectViewer = ({ project }: ProjectViewerProps) => {
         />
       );
     },
-    
+
     image: ({ data }: any) => {
       if (!data.file?.url) return null;
-      
+
       return (
         <figure className="my-6">
           <img
@@ -830,13 +814,12 @@ const ProjectViewer = ({ project }: ProjectViewerProps) => {
         </figure>
       );
     },
-    
+
     list: ({ data }: any) => {
       const ListTag = data.style === 'ordered' ? 'ol' : 'ul';
-      const listClass = data.style === 'ordered' 
-        ? 'list-decimal list-inside' 
-        : 'list-disc list-inside';
-      
+      const listClass =
+        data.style === 'ordered' ? 'list-decimal list-inside' : 'list-disc list-inside';
+
       return (
         <ListTag className={`mb-4 ${listClass}`}>
           {data.items.map((item: string, index: number) => (
@@ -849,10 +832,10 @@ const ProjectViewer = ({ project }: ProjectViewerProps) => {
         </ListTag>
       );
     },
-    
+
     embed: ({ data }: any) => {
       if (!data.embed) return null;
-      
+
       return (
         <div className="my-6 aspect-video">
           <iframe
@@ -872,10 +855,8 @@ const ProjectViewer = ({ project }: ProjectViewerProps) => {
       {/* 헤더 영역 */}
       <header className="mb-8">
         <h1 className="text-4xl font-bold mb-2">{project.title}</h1>
-        {project.subTitle && (
-          <h2 className="text-xl text-gray-600 mb-4">{project.subTitle}</h2>
-        )}
-        
+        {project.subTitle && <h2 className="text-xl text-gray-600 mb-4">{project.subTitle}</h2>}
+
         {/* 해시태그 */}
         {project.hashTag && project.hashTag.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
@@ -889,19 +870,14 @@ const ProjectViewer = ({ project }: ProjectViewerProps) => {
             ))}
           </div>
         )}
-        
+
         {/* 요약 정보 */}
-        <div className="p-4 bg-gray-50 rounded-lg whitespace-pre-line">
-          {project.summary}
-        </div>
+        <div className="p-4 bg-gray-50 rounded-lg whitespace-pre-line">{project.summary}</div>
       </header>
 
       {/* 본문 콘텐츠 */}
       <div className="prose prose-lg max-w-none">
-        <Output
-          data={project.contentJson}
-          renderers={customRenderers}
-        />
+        <Output data={project.contentJson} renderers={customRenderers} />
       </div>
     </article>
   );
@@ -959,9 +935,7 @@ const ProjectViewerManual = ({ contentJson }: { contentJson: OutputData }) => {
                 loading="lazy"
               />
               {block.data.caption && (
-                <figcaption className="text-sm text-gray-600 mt-2">
-                  {block.data.caption}
-                </figcaption>
+                <figcaption className="text-sm text-gray-600 mt-2">{block.data.caption}</figcaption>
               )}
             </figure>
           );
@@ -1006,11 +980,7 @@ const ProjectViewerManual = ({ contentJson }: { contentJson: OutputData }) => {
     }
   };
 
-  return (
-    <article className="prose max-w-none">
-      {contentJson.blocks.map(renderBlock)}
-    </article>
-  );
+  return <article className="prose max-w-none">{contentJson.blocks.map(renderBlock)}</article>;
 };
 ```
 
@@ -1100,12 +1070,14 @@ const ProjectViewerManual = ({ contentJson }: { contentJson: OutputData }) => {
 ### 7.1 이미지 업로드 관련
 
 **문제 상황**:
+
 - 네트워크 오류
 - 파일 크기 초과
 - 지원되지 않는 파일 형식
 - 서버 저장 공간 부족
 
 **처리 방안**:
+
 - 명확한 에러 메시지 표시
 - 재시도 버튼 제공
 - 업로드 진행률 표시
@@ -1114,12 +1086,14 @@ const ProjectViewerManual = ({ contentJson }: { contentJson: OutputData }) => {
 ### 7.2 저장 실패
 
 **문제 상황**:
+
 - API 서버 오류
 - 네트워크 연결 끊김
 - 유효성 검증 실패
 - 세션 만료
 
 **처리 방안**:
+
 - 로컬 스토리지에 자동 백업
 - 재시도 기능 제공
 - 실패 원인별 구체적인 안내 메시지
@@ -1128,6 +1102,7 @@ const ProjectViewerManual = ({ contentJson }: { contentJson: OutputData }) => {
 ### 7.3 데이터 손실 방지
 
 **구현 사항**:
+
 - 3초마다 자동 임시 저장
 - 페이지 이탈 시 경고 메시지 (beforeunload 이벤트)
 - 브라우저 종료 후 재접속 시 복구 옵션 제공
@@ -1136,11 +1111,13 @@ const ProjectViewerManual = ({ contentJson }: { contentJson: OutputData }) => {
 ### 7.4 렌더링 오류
 
 **문제 상황**:
+
 - 손상된 contentJson 데이터
 - 지원되지 않는 블록 타입
 - 누락된 필수 속성
 
 **처리 방안**:
+
 - try-catch로 각 블록별 오류 격리
 - 오류 발생 블록은 건너뛰고 계속 렌더링
 - 개발자 콘솔에 경고 로그 출력
@@ -1184,6 +1161,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 **목표**: 기본적인 텍스트 작성 및 저장이 가능한 최소 기능 에디터 구현
 
 #### 핵심 가치
+
 - 프로젝트 기반 구조 확립
 - Editor.js 통합 검증
 - 기본 CRUD 동작 확인
@@ -1191,8 +1169,10 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 #### 세부 작업
 
 **Week 1: 환경 설정 및 기본 인프라 (3일)**
+
 - [ ] React + TypeScript 프로젝트 초기화
 - [ ] 필수 패키지 설치
+
   ```bash
   # 코어 에디터
   npm install @editorjs/editorjs @editorjs/header @editorjs/paragraph
@@ -1203,6 +1183,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
   # 유틸리티
   npm install lodash.debounce
   ```
+
 - [ ] 프로젝트 폴더 구조 설정
   ```
   src/
@@ -1220,6 +1201,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 - [ ] 스키마 정의 (`schemas/project.schema.ts`)
 
 **Week 1-2: 기본 에디터 구현 (4일)**
+
 - [ ] Editor.js 컴포넌트 뼈대 작성 (`EditorComponent.tsx`)
   - Editor.js 인스턴스 생성 및 초기화
   - Paragraph, Header 블록만 포함 (최소 구성)
@@ -1234,6 +1216,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
   - Mock API 응답 처리
 
 **Week 2: 데이터 조회 및 렌더링 (3일)**
+
 - [ ] 간단한 Viewer 컴포넌트 작성
   - Paragraph, Header 블록 수동 렌더링
   - DOMPurify는 이후 Phase에서 추가 (일단 기본 렌더링만)
@@ -1243,6 +1226,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 - [ ] Mock 데이터로 전체 플로우 테스트
 
 #### 완료 기준 (Definition of Done)
+
 - [x] Editor.js가 정상적으로 초기화되고 텍스트 입력이 가능함
 - [x] 제목과 본문 내용을 저장하고 조회할 수 있음
 - [x] TypeScript 컴파일 에러가 없음
@@ -1250,10 +1234,11 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 - [x] 코드 리뷰 완료
 
 #### 리스크 및 대응
-| 리스크 | 영향도 | 대응 방안 |
-|--------|--------|----------|
-| Editor.js React 통합 이슈 | 높음 | useEffect 의존성 배열 주의, 공식 문서 참고 |
-| TypeScript 타입 불일치 | 중간 | @editorjs/editorjs 타입 정의 확인, any 사용 최소화 |
+
+| 리스크                    | 영향도 | 대응 방안                                          |
+| ------------------------- | ------ | -------------------------------------------------- |
+| Editor.js React 통합 이슈 | 높음   | useEffect 의존성 배열 주의, 공식 문서 참고         |
+| TypeScript 타입 불일치    | 중간   | @editorjs/editorjs 타입 정의 확인, any 사용 최소화 |
 
 ---
 
@@ -1262,6 +1247,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 **목표**: 이미지, 영상, 리스트 등 모든 블록 타입과 전체 메타데이터 입력 기능 구현
 
 #### 핵심 가치
+
 - 완전한 게시물 작성 기능 제공
 - 미디어 콘텐츠 지원
 - 프로덕션 수준의 데이터 구조
@@ -1269,6 +1255,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 #### 세부 작업
 
 **Week 3: 이미지 업로드 구현 (5일)**
+
 - [ ] 이미지 업로드 API 엔드포인트 구현 (`/api/upload-image`)
   ```typescript
   // pages/api/upload-image.ts
@@ -1294,6 +1281,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
   - 삭제 기능
 
 **Week 3-4: 추가 블록 타입 및 메타데이터 폼 (5일)**
+
 - [ ] 추가 Editor.js 도구 설치
   ```bash
   npm install @editorjs/list @editorjs/embed
@@ -1317,6 +1305,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
   - 최대 10개 제한
 
 #### 완료 기준 (Definition of Done)
+
 - [x] 이미지를 업로드하고 에디터에 삽입할 수 있음
 - [x] YouTube 영상을 임베드할 수 있음
 - [x] 리스트(번호, 불릿)를 작성할 수 있음
@@ -1326,11 +1315,12 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 - [x] 단위 테스트 작성 (이미지 업로드 API, 스키마 검증)
 
 #### 리스크 및 대응
-| 리스크 | 영향도 | 대응 방안 |
-|--------|--------|----------|
-| 파일 업로드 실패 | 높음 | 재시도 메커니즘, 명확한 에러 메시지 |
-| 대용량 이미지 업로드 | 중간 | 클라이언트 측 압축(선택), 진행률 표시 |
-| CORS 이슈 | 낮음 | Next.js API Route 사용으로 회피 |
+
+| 리스크               | 영향도 | 대응 방안                             |
+| -------------------- | ------ | ------------------------------------- |
+| 파일 업로드 실패     | 높음   | 재시도 메커니즘, 명확한 에러 메시지   |
+| 대용량 이미지 업로드 | 중간   | 클라이언트 측 압축(선택), 진행률 표시 |
+| CORS 이슈            | 낮음   | Next.js API Route 사용으로 회피       |
 
 ---
 
@@ -1339,6 +1329,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 **목표**: 데이터 손실 방지 및 사용자 편의 기능 구현
 
 #### 핵심 가치
+
 - 안정적인 사용자 경험
 - 데이터 손실 최소화
 - 작업 흐름 개선
@@ -1346,6 +1337,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 #### 세부 작업
 
 **Week 5: 자동 저장 및 복구 (4일)**
+
 - [ ] Undo/Redo 플러그인 통합
   ```bash
   npm install editorjs-undo
@@ -1365,6 +1357,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
   - beforeunload 이벤트 처리
 
 **Week 5-6: 로딩 상태 및 에러 처리 (3일)**
+
 - [ ] 전역 로딩 상태 관리
   - 저장 중 버튼 비활성화
   - 로딩 스피너 표시
@@ -1380,6 +1373,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
   - 자동 임시 저장 알림
 
 #### 완료 기준 (Definition of Done)
+
 - [x] Ctrl+Z로 작업을 되돌릴 수 있음
 - [x] 3초마다 자동으로 임시 저장됨
 - [x] 브라우저 종료 후 재접속 시 임시 저장 데이터 복구 가능
@@ -1388,10 +1382,11 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 - [x] 통합 테스트 작성 (자동 저장, 복구 플로우)
 
 #### 리스크 및 대응
-| 리스크 | 영향도 | 대응 방안 |
-|--------|--------|----------|
-| localStorage 용량 초과 | 낮음 | 이미지는 URL만 저장, 주기적으로 오래된 데이터 삭제 |
-| 디바운스 타이밍 이슈 | 낮음 | lodash.debounce 검증된 라이브러리 사용 |
+
+| 리스크                 | 영향도 | 대응 방안                                          |
+| ---------------------- | ------ | -------------------------------------------------- |
+| localStorage 용량 초과 | 낮음   | 이미지는 URL만 저장, 주기적으로 오래된 데이터 삭제 |
+| 디바운스 타이밍 이슈   | 낮음   | lodash.debounce 검증된 라이브러리 사용             |
 
 ---
 
@@ -1400,6 +1395,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 **목표**: 보안 강화 및 성능 최적화, 프로덕션 준비 완료
 
 #### 핵심 가치
+
 - XSS 공격 방지
 - 안전한 파일 업로드
 - 빠른 로딩 속도
@@ -1408,6 +1404,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 #### 세부 작업
 
 **Week 6-7: 보안 강화 (3일)**
+
 - [ ] XSS 방지 구현
   ```bash
   npm install isomorphic-dompurify
@@ -1424,6 +1421,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
   - CSRF 토큰 (프레임워크 기본 기능 활용)
 
 **Week 7: 성능 최적화 및 접근성 (4일)**
+
 - [ ] 성능 최적화
   - 이미지 lazy loading 적용
   - Editor.js 컴포넌트 동적 import (Code Splitting)
@@ -1437,6 +1435,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
   - 스크린 리더 테스트
 
 #### 완료 기준 (Definition of Done)
+
 - [x] DOMPurify로 모든 사용자 입력 새니타이징됨
 - [x] XSS 공격 시뮬레이션 테스트 통과
 - [x] 파일 업로드 보안 체크리스트 완료
@@ -1446,10 +1445,11 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 - [x] 보안 테스트 (침투 테스트 또는 자동화 도구)
 
 #### 리스크 및 대응
-| 리스크 | 영향도 | 대응 방안 |
-|--------|--------|----------|
-| DOMPurify 과도한 필터링 | 중간 | 허용 태그 화이트리스트 세밀하게 조정 |
-| 성능 저하 | 중간 | 프로파일링으로 병목 지점 식별, 필요시 가상화 적용 |
+
+| 리스크                  | 영향도 | 대응 방안                                         |
+| ----------------------- | ------ | ------------------------------------------------- |
+| DOMPurify 과도한 필터링 | 중간   | 허용 태그 화이트리스트 세밀하게 조정              |
+| 성능 저하               | 중간   | 프로파일링으로 병목 지점 식별, 필요시 가상화 적용 |
 
 ---
 
@@ -1458,6 +1458,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 **목표**: 안정성 확보 및 유지보수성 향상
 
 #### 핵심 가치
+
 - 버그 최소화
 - 코드 품질 향상
 - 팀 협업 효율성
@@ -1465,6 +1466,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 #### 세부 작업
 
 **Week 7-8: 테스트 작성 (4일)**
+
 - [ ] 테스트 환경 설정
   ```bash
   npm install --save-dev @testing-library/react @testing-library/jest-dom \
@@ -1486,6 +1488,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
   - 크로스 브라우저 테스트
 
 **Week 8: Storybook 문서화 (3일, 선택사항)**
+
 - [ ] Storybook 설정
   ```bash
   npx storybook init
@@ -1504,6 +1507,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
   - API 문서
 
 #### 완료 기준 (Definition of Done)
+
 - [x] 테스트 커버리지 80% 이상 (단위 + 통합)
 - [x] 모든 테스트 통과 (CI/CD 파이프라인)
 - [x] Storybook 배포 (선택사항)
@@ -1511,10 +1515,11 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 - [x] API 문서 작성 (Swagger/OpenAPI 또는 Markdown)
 
 #### 리스크 및 대응
-| 리스크 | 영향도 | 대응 방안 |
-|--------|--------|----------|
-| Editor.js 테스트 어려움 | 중간 | Mock 데이터 활용, E2E 테스트로 보완 |
-| 테스트 작성 시간 부족 | 낮음 | 핵심 기능 우선 테스트, 나머지는 점진적 추가 |
+
+| 리스크                  | 영향도 | 대응 방안                                   |
+| ----------------------- | ------ | ------------------------------------------- |
+| Editor.js 테스트 어려움 | 중간   | Mock 데이터 활용, E2E 테스트로 보완         |
+| 테스트 작성 시간 부족   | 낮음   | 핵심 기능 우선 테스트, 나머지는 점진적 추가 |
 
 ---
 
@@ -1523,6 +1528,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 **목표**: 제품 완성도 극대화 및 확장 기능 추가
 
 #### 핵심 가치
+
 - 사용자 만족도 향상
 - 차별화된 경험 제공
 - 향후 확장성 확보
@@ -1530,6 +1536,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 #### 세부 작업
 
 **Week 8-9: 반응형 디자인 및 테마 (3일)**
+
 - [ ] Tailwind CSS 고급 활용
   - 반응형 브레이크포인트 최적화
   - 커스텀 디자인 토큰 정의
@@ -1542,6 +1549,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
   - 로딩 스피너 개선
 
 **Week 9: 추가 블록 타입 (4일)**
+
 - [ ] 코드 블록
   ```bash
   npm install @editorjs/code
@@ -1563,6 +1571,7 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 - [ ] Viewer에 추가 블록 렌더러 구현
 
 #### 완료 기준 (Definition of Done)
+
 - [x] 모바일, 태블릿, 데스크톱에서 완벽하게 동작
 - [x] 다크 모드 지원 (선택사항)
 - [x] 추가 블록 타입 정상 동작 (선택사항)
@@ -1570,10 +1579,11 @@ export const useBeforeUnload = (hasUnsavedChanges: boolean) => {
 - [x] 프로덕션 배포 준비 완료
 
 #### 리스크 및 대응
-| 리스크 | 영향도 | 대응 방안 |
-|--------|--------|----------|
-| 반응형 디자인 복잡도 | 낮음 | 모바일 우선 접근법, 점진적 개선 |
-| 추가 블록 타입 통합 이슈 | 낮음 | 공식 문서 참고, 필요시 커스텀 블록 개발 |
+
+| 리스크                   | 영향도 | 대응 방안                               |
+| ------------------------ | ------ | --------------------------------------- |
+| 반응형 디자인 복잡도     | 낮음   | 모바일 우선 접근법, 점진적 개선         |
+| 추가 블록 타입 통합 이슈 | 낮음   | 공식 문서 참고, 필요시 커스텀 블록 개발 |
 
 ---
 
@@ -1599,10 +1609,12 @@ graph TD
 ```
 
 ### 병렬 작업 가능 영역
+
 - **Phase 2 후반 + Phase 3 초반**: 메타데이터 폼 구현과 자동 저장 기능은 독립적으로 진행 가능
 - **Phase 4 보안 작업 + Phase 5 테스트 작성**: 일부 병렬 진행 가능 (단, 보안 기능 완료 후 테스트)
 
 ### 블로킹 의존성
+
 - Phase 1 완료 전까지 다른 Phase 시작 불가 (기반 구조 필수)
 - Phase 2 완료 전까지 Phase 3 시작 지양 (핵심 기능 필요)
 - Phase 4 완료 후 Phase 5 본격 시작 권장 (보안 테스트 포함)
@@ -1611,14 +1623,14 @@ graph TD
 
 ## 리스크 매트릭스 (종합)
 
-| 리스크 항목 | 영향도 | 발생 확률 | 우선순위 | 대응 전략 |
-|------------|--------|----------|----------|----------|
-| Editor.js React 통합 이슈 | 높음 | 중간 | P1 | 공식 예제 참고, useEffect 의존성 주의 |
-| 파일 업로드 실패 | 높음 | 낮음 | P2 | 재시도, 백업, 명확한 에러 메시지 |
-| XSS 공격 취약점 | 높음 | 낮음 | P1 | DOMPurify 적용, 보안 테스트 |
-| 성능 저하 | 중간 | 중간 | P2 | 프로파일링, 최적화, lazy loading |
-| 테스트 커버리지 부족 | 중간 | 높음 | P3 | CI/CD 통합, 핵심 기능 우선 테스트 |
-| 일정 지연 | 중간 | 중간 | P2 | 버퍼 시간 확보, 선택 기능 Phase 6으로 이동 |
+| 리스크 항목               | 영향도 | 발생 확률 | 우선순위 | 대응 전략                                  |
+| ------------------------- | ------ | --------- | -------- | ------------------------------------------ |
+| Editor.js React 통합 이슈 | 높음   | 중간      | P1       | 공식 예제 참고, useEffect 의존성 주의      |
+| 파일 업로드 실패          | 높음   | 낮음      | P2       | 재시도, 백업, 명확한 에러 메시지           |
+| XSS 공격 취약점           | 높음   | 낮음      | P1       | DOMPurify 적용, 보안 테스트                |
+| 성능 저하                 | 중간   | 중간      | P2       | 프로파일링, 최적화, lazy loading           |
+| 테스트 커버리지 부족      | 중간   | 높음      | P3       | CI/CD 통합, 핵심 기능 우선 테스트          |
+| 일정 지연                 | 중간   | 중간      | P2       | 버퍼 시간 확보, 선택 기능 Phase 6으로 이동 |
 
 ---
 
@@ -1708,6 +1720,6 @@ npm install next-themes
 - [WCAG 2.1 가이드라인](https://www.w3.org/WAI/WCAG21/quickref/)
 
 ---
- 
+
 **최종 수정일**: 2025년 10월 14일  
 **버전**: 2.0
